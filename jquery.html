@@ -1,0 +1,112 @@
+   
+
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+	
+	<style>
+		.template_class{
+            display: flex;
+    justify-content: space-around;
+    padding: 10px;
+        }
+        .delete{
+            display: none;
+        }
+	</style>
+</head>
+<body>
+	<div class="container">
+
+		<h1>Image Uploader</h1>
+
+		<input type="file" name="images[]" id="images" multiple>
+		<hr>
+		<div id="images-to-upload">
+
+		</div>
+
+		<hr>
+
+		<button type="submit" id="submit" class="btn btn-sm btn-success">Upload all images</button>
+ </div>
+
+	<script>
+		var fileCollection = new Array();
+
+		$('#images').on('change',function(e){
+			var files = e.target.files;
+            var template= ''
+			$.each(files, function(i, file){
+             console.log(file)
+				fileCollection.push(file);
+				var reader = new FileReader();
+				reader.readAsDataURL(file);
+				reader.onload = function(e){
+
+					 template = '<div class="template_class">'+
+						'<label>'+file.name+'</label>'+
+						' <a  href="'+e.target.result+'" download="'+file.name+'"><button class="btn btn-sm btn-info download">Download</button></a>'+
+						'<button class="deleteButton" onclick="deleteList('+i+')">Delete</button>'+
+					'</div>';
+                 
+                    $('#images-to-upload').append(template);
+				};
+            });
+           });
+
+        
+            $("#submit").click(function(e){
+			e.preventDefault();
+            console.log(fileCollection)
+
+			//this form index
+// 			var index = $(this).index();
+
+// 			var formdata = new FormData($(this)[0]); //direct form not object
+
+// 			//append the file relation to index
+// 			formdata.append('image',fileCollection[index]);
+// console.log("Total form data",formdata)
+// 			var request = new XMLHttpRequest();
+// 			request.open('post', 'server.php', true);
+
+// 			request.send(formdata);
+
+		 });
+
+
+                    function deleteList(id){
+                        $( ".template_class" ).remove();
+                        console.log("both values",id);
+                        let copy= fileCollection.filter(function(ele,index){ 
+                                console.log(id,index);
+                                    return index != id; 
+                                });
+                      fileCollection.splice(0, fileCollection.length)
+                      fileCollection.push(...copy);
+
+
+                            var template= ''
+                            $.each(fileCollection, function(i, file){
+                            console.log(file)
+                                var reader = new FileReader();
+                                reader.readAsDataURL(file);
+                                reader.onload = function(e){
+
+                                    template = '<div class="template_class">'+
+                                        '<label>'+file.name+'</label>'+
+                                        ' <a  href="'+e.target.result+'" download="'+file.name+'"><button class="btn btn-sm btn-info download">Download</button></a>'+
+                                        '<button class="deleteButton" onclick="deleteList('+i+')">Delete</button>'+
+                                    '</div>';
+                                
+                                    $('#images-to-upload').append(template);
+                                };
+                            });
+                     }
+	</script>
+</body>
+</html>
