@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title> Prasanth Videos</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <style>
+      .container{
+        text-align: center;
+      }
+      table{
+        text-align: center;
+    align-items: center;
+    margin: auto;
+      }
+      th{
+        padding: 0px 30px;
+    }
+    .hidetext { -webkit-text-security: none; }
+.hidetext { -webkit-text-security: circle; }
+.hidetext { -webkit-text-security: square; }
+.form-group{
+    padding: 10px;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+        <div class="col-sm-6">
+          <div class="panel panel-primary">
+            <form class="panel-body" id="myForm" >
+              <div class="form-group">
+                <label for="username">
+                  User Name
+                </label>
+                <input type="text"
+                       class="form-control"
+                       id="username" />
+              </div>
+              <div class="form-group">
+                <label for="password">
+                  Password
+                </label>
+                <input type="password"
+                       class="form-control"
+                      
+                       id="password" />
+              </div>
+              <div class="form-group">
+                <label for="email">
+                  Email
+                </label>
+                <input type="email"
+                       class="form-control"
+                      
+                       id="email" />
+              </div>
+             
+              <div class="form-group">
+                <label for="address">
+                  Address
+                </label>
+                <textarea id="address" ></textarea>
+              </div>
+              <div class="form-group">
+                <label >Gender</label>
+            <input type="radio" id="gender" name="gender" value="male">
+            <label for="male">Male</label>
+            <input type="radio" id="gender" name="gender" value="female">
+            <label for="female">Female</label>
+             
+            </div>
+            <div class="form-group">
+                <label for="country">Country</label>
+                <select id="country">
+
+                    <option value="india">India</option>
+                    <option value="china">Chinna</option>
+                </select>
+              </div>
+            </div>
+            <div class="panel-footer">
+              <div class="row">
+                <div class="col-xs-12">
+                  <button type="button" id="updateButton"
+                          class="btn btn-primary"
+                          onclick="productUpdate();">
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+
+
+
+
+    <div class="row">
+      <div class="col-sm-6">
+        <h2>Displaying User Form</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <table id="productTable" 
+               class="table table-bordered table-condensed table-striped">
+          <thead>
+            <tr>
+              <th>Edit</th>
+              <th>User Name</th>
+              <th>Password</th>
+              <th>Email</th>
+              <th>Address</th>
+              <th>Gender</th>
+              <th>Coutry</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+
+   
+  </div>
+<button type="button" class="btn btn-" id="submit">submit</button>
+<div >
+
+</div>
+  <script>
+$("#submit").click(function(e){
+var arrData=[]
+$("#productTable tr").each(function(){
+var currentRow = $(this);
+var username = currentRow.find("td:eq(1)").text();
+var password = currentRow.find("td:eq(2)").text();
+var email = currentRow.find("td:eq(3)").text();
+var address = currentRow.find("td:eq(4)").text();
+var gender = currentRow.find("td:eq(5)").text();
+var country = currentRow.find("td:eq(6)").text();
+
+var obj ={};
+obj.Username=username;
+obj.Password=password;
+obj.Email=email;
+obj.Address=address;
+obj.Gender=gender;
+obj.Country=country;
+
+arrData.push(obj)
+})
+
+console.log("-------------------",arrData)
+  
+})
+    // Next id for adding a new Product
+    var nextId = 1;
+    // ID of Product currently editing
+    var activeId = 0;
+
+    function productDisplay(ctl) {
+      var row = $(ctl).parents("tr");
+      var cols = row.children("td");
+
+      activeId = $($(cols[0]).children("button")[0]).data("id");
+      $("#username").val($(cols[1]).text());
+      $("#password").val($(cols[2]).text());
+      $("#email").val($(cols[3]).text());
+
+      $("#address").val($(cols[4]).text());
+      $("input[name=gender][value=" + $(cols[5]).text() + "]").attr('checked', 'checked');
+     
+      $("#country").val($(cols[6]).text());
+
+      // Change Update Button Text
+      $("#updateButton").text("Update");
+    }
+
+    function productUpdate() {
+      if ($("#updateButton").text() == "Update") {
+        productUpdateInTable(activeId);
+      }
+      else {
+        productAddToTable();
+      }
+
+      // Clear form fields
+      formClear();
+
+      // Focus to product name field
+      $("#productname").focus();
+    }
+
+    // Add product to <table>
+    function productAddToTable() {
+      // First check if a <tbody> tag exists, add one if not
+      if ($("#productTable tbody").length == 0) {
+        $("#productTable").append("<tbody></tbody>");
+      }
+
+      // Append product to table
+      $("#productTable tbody").append(
+        productBuildTableRow(nextId));
+
+      // Increment next ID to use
+      nextId += 1;
+    }
+
+    // Update product in <table>
+    function productUpdateInTable(id) {
+      // Find Product in <table>
+      var row = $("#productTable button[data-id='" + id + "']")
+                .parents("tr")[0];
+
+      // Add changed product to table
+      $(row).after(productBuildTableRow(id));
+      // Remove original product
+      $(row).remove();
+
+      // Clear form fields
+      formClear();
+     
+      // Change Update Button Text
+      $("#updateButton").text("Add");
+    }
+
+    // Build a <table> row of Product data
+    function productBuildTableRow(id) {
+      var ret =
+      "<tr>" +
+        "<td>" +
+          "<button type='button' " +
+                  "onclick='productDisplay(this);' " +
+                  "class='btn btn-default' " +
+                  "data-id='" + id + "'>" +
+          "</button>" +
+        "</td>" +
+        "<td id='usernamet'>" + $("#username").val() + "</td>" +
+        "<td id='passwordt' class='hidetext'>" + $("#password").val() + "</td>" +
+        "<td id='emailt'>" + $("#email").val() + "</td>" +
+        "<td id='addresst'>" + $("#address").val() + "</td>" +
+        "<td id='gendert'>" + $('input[name="gender"]:checked').val() + "</td>" +
+        "<td id='countryt'>" + $("#country").val() + "</td>" +
+        "<td>" +
+          "<button type='button' " +
+                  "onclick='productDelete(this);' " +
+                  "class='btn btn-default' " +
+                  "data-id='" + id + "'>" +
+          "</button>" +
+        "</td>" +
+      "</tr>"
+
+      return ret;
+    }
+
+    // Delete product from <table>
+    function productDelete(ctl) {
+      $(ctl).parents("tr").remove();
+    }
+
+    // Clear form fields
+    function formClear() {
+    //   $("#username").val("");
+    //   $("#password").val("");
+    //   $("#email").val("");
+    //   $("#address").val("");
+    //   $('input[name="gender"]:checked').val("")
+    //   $("#country").val("");
+      document.getElementById("myForm").reset();
+    }
+  </script>
+</body>
+</html>
